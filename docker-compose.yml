@@ -6,6 +6,8 @@ services:
       - nginx
     expose:
       - 8000 #4  is the internal port on which the FastAPI application is running
+    environment:
+      - API_KEY=${API_KEY}
 
   nginx:
     build: ./nginx
