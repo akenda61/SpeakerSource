@@ -1,0 +1,21 @@
+version: '3.8'
+services:
+  fastapi-app: #3 this is the docker container defined for the fast API app sevice, the service is awaiting requests from the server at port 8000
+    build: ./app
+    depends_on:
+      - nginx
+    expose:
+      - 8000 #4  is the internal port on which the FastAPI application is running
+
+  nginx:
+    build: ./nginx
+    ports:
+      - "8000:8000"
+
+
+#these are the two docker containers
+#the first one is called fastapi app as it contains the gunicorn surrounding the fast API code
+#the second one is the nginx which is the externally facing server 
+
+#ports: - "8080:8000": This maps port 8000 of the host machine to port 8000 of the NGINX container. 
+#So, when you access http://localhost:8000 on your host machine, it will forward the request to port 8000 of the NGINX container.
