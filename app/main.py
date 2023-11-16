@@ -12,8 +12,28 @@ def load_api_key(file_path):
         config = yaml.safe_load(file)
         return config['api_key']
 
-OPENAI_API_KEY = load_api_key('cfg.yaml')
+
 #print(api_key) 
+
+
+# Function to get environment variable
+def get_api_key():
+    api_key = os.getenv('API_KEY')
+    if api_key is None:
+        raise ValueError("API_KEY environment variable is not set.")
+    return api_key
+
+# Main code
+try:
+    OPENAI_API_KEY = get_api_key() #this gets it from the docker-compose    #load_api_key('cfg.yaml')
+    # Use api_key in your application
+except ValueError as e:
+    print(f"Error: {e}")
+    # Handle the error (e.g., exit the program, log the error, etc.)
+
+
+
+
 
 # Check OpenAI version is correct
 required_version = version.parse("1.1.1")
@@ -27,7 +47,6 @@ else:
 
 # Start app
 app = FastAPI()
-
 
 
 # Init client
