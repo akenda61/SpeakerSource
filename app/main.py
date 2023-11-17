@@ -6,6 +6,14 @@ import openai
 from openai import OpenAI
 import functions
 import yaml
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+logger.info('~~~~~~~~~~~~~~~~~LOGGING TEST ~~~~~~~~~~~~~~~~~~')
+print("~~~~~~~~~~~~PRINT TEST~~~~~~~~~~")
+
 
 def load_api_key(file_path):
     with open(file_path, 'r') as file:
@@ -14,10 +22,13 @@ def load_api_key(file_path):
 
 
 #print(api_key) 
-
+logger.info("####### printing env variables")
+for key, value in os.environ.items():
+    logger.info(f"{key}: {value}")
 
 # Function to get environment variable
 def get_api_key():
+
     api_key = os.getenv('API_KEY')
     if api_key is None:
         raise ValueError("API_KEY environment variable is not set.")
@@ -25,15 +36,11 @@ def get_api_key():
 
 # Main code
 try:
-    OPENAI_API_KEY = get_api_key() #this gets it from the docker-compose    #load_api_key('cfg.yaml')
+    OPENAI_API_KEY = get_api_key() # # #this gets it from the docker-compose    #load_api_key('cfg.yaml')
     # Use api_key in your application
 except ValueError as e:
-    print(f"Error: {e}")
+    logger.info(f"Error: {e}")
     # Handle the error (e.g., exit the program, log the error, etc.)
-
-
-
-
 
 # Check OpenAI version is correct
 required_version = version.parse("1.1.1")
@@ -43,7 +50,7 @@ if current_version < required_version:
   raise ValueError(f"Error: OpenAI version {openai.__version__}"
                    " is less than the required version 1.1.1")
 else:
-  print("OpenAI version is compatible.")
+  logger.info("OpenAI version is compatible.")
 
 # Start app
 app = FastAPI()
@@ -59,15 +66,15 @@ assistant_id = functions.create_assistant(client)
 #test
 @app.get('/test')
 async def test():
-    print("test...")
+    logger.info("test...")
     return "test complete"
 
 #start
 @app.get('/start')
 async def start_conversation():
-    print("Starting a new conversation...")
+    logger.info("Starting a new conversation...")
     thread = client.beta.threads.create()
-    print(f"New thread created with ID: {thread.id}")
+    logger.info(f"New thread created with ID: {thread.id}")
     return {"thread_id": thread.id}
 
 #chat
@@ -79,10 +86,10 @@ async def chat(request: Request):
     # Rest of your code
 
     if not thread_id:
-        print("Error: Missing thread_id")  # Debugging line
+        logger.info("Error: Missing thread_id")  # Debugging line
         return {"error": "Missing thread_id"}, 400
 
-    print(f"Received message: {user_input} for thread ID: {thread_id}"
+    logger.info(f"Received message: {user_input} for thread ID: {thread_id}"
             )  # Debugging line
 
   # Add the user's message to the thread
@@ -98,7 +105,7 @@ async def chat(request: Request):
     while True:
         run_status = client.beta.threads.runs.retrieve(thread_id=thread_id,
                                                     run_id=run.id)
-        print(f"Run status: {run_status.status}")
+        logger.info(f"Run status: {run_status.status}")
         if run_status.status == 'completed':
             break
         sleep(1)  # Wait for a second before checking again
@@ -107,5 +114,5 @@ async def chat(request: Request):
     messages = client.beta.threads.messages.list(thread_id=thread_id)
     response = messages.data[0].content[0].text.value
 
-    print(f"Assistant response: {response}")  # Debugging line
+    logger.info(f"Assistant response: {response}")  # Debugging line
     return {"response": response}
