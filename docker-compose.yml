@@ -4,20 +4,26 @@ services:
     build: ./app
     depends_on:
       - nginx
-    expose:
-      - 8000 #4  is the internal port on which the FastAPI application is running
+    #expose:
+    #  - 8000 #4  is the internal port on which the FastAPI application is running
     environment:
       - API_KEY=${API_KEY}
+    ports:
+      - "8080:80" #we dont really need to do this unless we want a direct way into the container and avoid the nginx 
 
   nginx:
-    build: ./nginx
+    image: nginx:alpine
+    volumes: 
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf #volume binding is host path : container path
     ports:
       - "80:80"
 
+#creating two docker containers, nginx and fastapi
 
-#these are the two docker containers
-#the first one is called fastapi app as it contains the gunicorn surrounding the fast API code
-#the second one is the nginx which is the externally facing server 
+# when you create a container you map ports from host : container
+# this means any time traffic comes into your machine on port 8080, its sent to the container on port 80. 
+# nginx is mapping the host port 80 to the container port 80 so when something comes to port 80 on my machine it will be send to the nginx container on port 80 
+# nginx container (as in the config) is listening on port 80 for traffic (that will have come into the host machine on port 80 and mapped to the container port 80)
+# it then passes it to the fast-api container on port 80, which is set up to be listening on port 80 for traffic to the fast-api API.
 
-#ports: - "8080:8000": This maps port 8000 of the host machine to port 8000 of the NGINX container. 
-#So, when you access http://localhost:8000 on your host machine, it will forward the request to port 8000 of the NGINX container.
+#internet -> host machine port 80 -> nginx container port 80 -> fastAPI container port 80 -> guinicorn/fastAPI 
