@@ -13,7 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-logger.info('~~~~~~~~~~~~~~~~~LOGGING TES6 ~~~~~~~~~~~~~~~~~~')
+logger.info('~~~~~~~~~~~~~~~~~LOGGING TES7 ~~~~~~~~~~~~~~~~~~')
 print("~~~~~~~~~~~~PRINT TEST~~~~~~~~~~")
 
 
